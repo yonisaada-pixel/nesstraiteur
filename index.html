@@ -303,6 +303,106 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
   .f2-row{grid-template-columns:1fr}
   .admin-header{flex-wrap:wrap;gap:0.5rem}
 }
+
+/* ===== SPLASH PAGE ===== */
+#splash-page{
+  position:fixed;inset:0;z-index:9999;
+  background:#1a1208;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:opacity 0.8s ease, visibility 0.8s ease;
+}
+#splash-page.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.splash-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 50%, rgba(160,120,64,0.12) 0%, transparent 60%),
+             radial-gradient(ellipse at 70% 50%, rgba(160,120,64,0.07) 0%, transparent 60%);
+}
+.splash-line-top,.splash-line-bottom{
+  position:absolute;left:50%;transform:translateX(-50%);
+  width:1px;background:rgba(160,120,64,0.25);
+  animation:lineGrow 1.2s ease forwards;
+}
+.splash-line-top{top:0;transform-origin:top;height:0;}
+.splash-line-bottom{bottom:0;transform-origin:bottom;height:0;}
+@keyframes lineGrow{to{height:22vh;}}
+.splash-content{
+  position:relative;z-index:2;
+  text-align:center;
+  animation:fadeUp 1s ease 0.3s both;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(30px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.splash-eyebrow{
+  font-family:'Jost',sans-serif;
+  font-size:0.6rem;letter-spacing:0.5em;text-transform:uppercase;
+  color:rgba(160,120,64,0.7);margin-bottom:2rem;
+}
+.splash-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.5rem,8vw,7rem);
+  font-weight:300;line-height:1;
+  color:#FDFAF6;letter-spacing:0.05em;
+  margin-bottom:0.3rem;
+}
+.splash-logo em{color:#A07840;font-style:italic;}
+.splash-divider{
+  width:60px;height:1px;background:#A07840;
+  margin:2rem auto;opacity:0.6;
+}
+.splash-tagline{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;font-style:italic;
+  color:rgba(253,250,246,0.45);
+  letter-spacing:0.1em;margin-bottom:3.5rem;
+}
+.splash-nav{
+  display:flex;gap:0;
+  border:1px solid rgba(160,120,64,0.3);
+}
+.splash-nav-btn{
+  padding:0.9rem 2rem;
+  font-family:'Jost',sans-serif;
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(253,250,246,0.6);
+  background:transparent;border:none;
+  border-right:1px solid rgba(160,120,64,0.3);
+  cursor:pointer;transition:all 0.3s;
+  text-decoration:none;display:inline-block;
+}
+.splash-nav-btn:last-child{border-right:none;}
+.splash-nav-btn:hover{background:rgba(160,120,64,0.15);color:#FDFAF6;}
+.splash-enter{
+  margin-top:3rem;
+  display:inline-flex;align-items:center;gap:0.75rem;
+  font-family:'Jost',sans-serif;
+  font-size:0.65rem;letter-spacing:0.35em;text-transform:uppercase;
+  color:rgba(253,250,246,0.35);cursor:pointer;
+  background:none;border:none;
+  transition:color 0.3s;
+}
+.splash-enter:hover{color:rgba(253,250,246,0.7);}
+.splash-enter-line{
+  width:30px;height:1px;background:currentColor;
+  transition:width 0.3s;
+}
+.splash-enter:hover .splash-enter-line{width:50px;}
+.splash-corner{
+  position:absolute;width:40px;height:40px;
+  border-color:rgba(160,120,64,0.2);border-style:solid;border-width:0;
+}
+.splash-corner.tl{top:2rem;left:2rem;border-top-width:1px;border-left-width:1px;}
+.splash-corner.tr{top:2rem;right:2rem;border-top-width:1px;border-right-width:1px;}
+.splash-corner.bl{bottom:2rem;left:2rem;border-bottom-width:1px;border-left-width:1px;}
+.splash-corner.br{bottom:2rem;right:2rem;border-bottom-width:1px;border-right-width:1px;}
+@media(max-width:600px){
+  .splash-nav{flex-direction:column;}
+  .splash-nav-btn{border-right:none;border-bottom:1px solid rgba(160,120,64,0.3);}
+  .splash-nav-btn:last-child{border-bottom:none;}
+}
+
 </style>
 </head>
 <body>
@@ -493,6 +593,35 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
 
 <!-- ===== SITE PRINCIPAL ===== -->
 <div id="main-site">
+
+<!-- ===== SPLASH PAGE ===== -->
+<div id="splash-page">
+  <div class="splash-bg"></div>
+  <div class="splash-line-top"></div>
+  <div class="splash-line-bottom"></div>
+  <div class="splash-corner tl"></div>
+  <div class="splash-corner tr"></div>
+  <div class="splash-corner bl"></div>
+  <div class="splash-corner br"></div>
+  <div class="splash-content">
+    <div class="splash-eyebrow">Traiteur d'exception · Île-de-France</div>
+    <div class="splash-logo">Ness <em>Traiteur</em></div>
+    <div class="splash-tagline">Cuisine orientale sublimée</div>
+    <div class="splash-divider"></div>
+    <div class="splash-nav">
+      <a class="splash-nav-btn" href="#prestations" onclick="enterSite()">Prestations</a>
+      <a class="splash-nav-btn" href="#menu" onclick="enterSite()">Menu</a>
+      <a class="splash-nav-btn" href="#produits" onclick="enterSite()">Produits</a>
+      <a class="splash-nav-btn" href="#galerie" onclick="enterSite()">Galerie</a>
+      <a class="splash-nav-btn" href="#contact" onclick="enterSite()">Contact</a>
+    </div>
+    <button class="splash-enter" onclick="enterSite(); window.location='#accueil'">
+      <span class="splash-enter-line"></span>
+      <span>Découvrir</span>
+      <span class="splash-enter-line"></span>
+    </button>
+  </div>
+</div>
 
 <nav>
   <a class="nav-logo" href="#accueil">Ness <span>Traiteur</span></a>
@@ -1111,6 +1240,16 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
 </div><!-- /main-site -->
 
 <script>
+
+function enterSite(){
+  document.getElementById('splash-page').classList.add('hidden');
+  sessionStorage.setItem('splash_seen','1');
+}
+// Montrer splash seulement si pas déjà vu dans cette session
+if(sessionStorage.getItem('splash_seen')){
+  document.getElementById('splash-page').classList.add('hidden');
+}
+
 // ===== DATA =====
 const ADMIN_PWD_KEY = 'ness_admin_pwd';
 const CLIENTS_KEY = 'ness_clients';
