@@ -310,9 +310,9 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
   background:#1a1208;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  transition:opacity 0.8s ease, visibility 0.8s ease;
+  transition:opacity 0.8s ease;
 }
-#splash-page.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+#splash-page.hidden{opacity:0;visibility:hidden;pointer-events:none;display:none;}
 .splash-bg{
   position:absolute;inset:0;
   background:radial-gradient(ellipse at 30% 50%, rgba(160,120,64,0.12) 0%, transparent 60%),
@@ -1242,12 +1242,16 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
 <script>
 
 function enterSite(){
-  document.getElementById('splash-page').classList.add('hidden');
+  const sp = document.getElementById('splash-page');
+  sp.style.opacity = '0';
+  sp.style.pointerEvents = 'none';
+  setTimeout(() => { sp.style.display = 'none'; }, 800);
   sessionStorage.setItem('splash_seen','1');
 }
 // Montrer splash seulement si pas déjà vu dans cette session
 if(sessionStorage.getItem('splash_seen')){
-  document.getElementById('splash-page').classList.add('hidden');
+  const sp = document.getElementById('splash-page');
+  sp.style.display = 'none';
 }
 
 // ===== DATA =====
