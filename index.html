@@ -312,6 +312,26 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
 .hero-main-title em{display:block;font-style:italic;color:var(--gold);}
 .hero-sep{width:50px;height:1px;background:var(--gold);margin:2.5rem auto;opacity:0.5;}
 .hero-tagline{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-style:italic;color:var(--text-light);margin-bottom:3rem;}
+
+/* ===== SYSTÈME ONGLETS ===== */
+section[id] {
+  display: none;
+  min-height: 100vh;
+}
+section[id].tab-active {
+  display: block;
+}
+.hero {
+  display: flex !important;
+  min-height: 100vh;
+}
+.hero.tab-active {
+  display: flex !important;
+}
+.nav-center a.nav-tab-active {
+  color: var(--gold) !important;
+  border-bottom: 1px solid var(--gold);
+}
 </style>
 </head>
 <body>
@@ -504,13 +524,13 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
 <div id="main-site">
 
 <nav>
-  <a class="nav-logo" href="#accueil">Ness <span>Traiteur</span></a>
+  <a class="nav-logo" href="#" onclick="showTab('accueil');return false;">Ness <span>Traiteur</span></a>
   <ul class="nav-center">
-    <li><a href="#prestations">Prestations</a></li>
-    <li><a href="#menu">Menu</a></li>
-    <li><a href="#produits">Produits</a></li>
-    <li><a href="#galerie">Galerie</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#" onclick="showTab('prestations');return false;" data-tab="prestations">Prestations</a></li>
+    <li><a href="#" onclick="showTab('menu');return false;" data-tab="menu">Menu</a></li>
+    <li><a href="#" onclick="showTab('produits');return false;" data-tab="produits">Produits</a></li>
+    <li><a href="#" onclick="showTab('galerie');return false;" data-tab="galerie">Galerie</a></li>
+    <li><a href="#" onclick="showTab('contact');return false;" data-tab="contact">Contact</a></li>
   </ul>
   <div class="nav-right">
     <span class="nav-user" id="nav-user-area" style="display:none"></span>
@@ -1114,6 +1134,35 @@ footer{background:var(--warm-dark);padding:2.5rem 6rem;display:flex;justify-cont
 </div><!-- /main-site -->
 
 <script>
+
+function showTab(tabName) {
+  // Cacher toutes les sections
+  document.querySelectorAll('section[id]').forEach(s => {
+    s.classList.remove('tab-active');
+  });
+  // Montrer la section voulue
+  const target = document.getElementById(tabName);
+  if (target) target.classList.add('tab-active');
+  // Mettre à jour les liens nav actifs
+  document.querySelectorAll('.nav-center a[data-tab]').forEach(a => {
+    a.classList.remove('nav-tab-active');
+    if (a.dataset.tab === tabName) a.classList.add('nav-tab-active');
+  });
+  window.scrollTo(0, 0);
+}
+// Au chargement : montrer accueil par défaut
+document.addEventListener('DOMContentLoaded', function() {
+  showTab('accueil');
+  // Réparer les boutons du hero qui utilisent href
+  document.querySelectorAll('.hero a[href^="#"]').forEach(a => {
+    const target = a.getAttribute('href').replace('#','');
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      showTab(target);
+    });
+  });
+});
+
 // ===== DATA =====
 const ADMIN_PWD_KEY = 'ness_admin_pwd';
 const CLIENTS_KEY = 'ness_clients';
