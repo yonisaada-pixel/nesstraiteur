@@ -524,13 +524,13 @@ section[id].tab-active {
 <div id="main-site">
 
 <nav>
-  <a class="nav-logo" href="#" onclick="showTab('accueil');return false;">Ness <span>Traiteur</span></a>
+  <a class="nav-logo" href="javascript:void(0)" onclick="showTab('accueil')">Ness <span>Traiteur</span></a>
   <ul class="nav-center">
-    <li><a href="#" onclick="showTab('prestations');return false;" data-tab="prestations">Prestations</a></li>
-    <li><a href="#" onclick="showTab('menu');return false;" data-tab="menu">Menu</a></li>
-    <li><a href="#" onclick="showTab('produits');return false;" data-tab="produits">Produits</a></li>
-    <li><a href="#" onclick="showTab('galerie');return false;" data-tab="galerie">Galerie</a></li>
-    <li><a href="#" onclick="showTab('contact');return false;" data-tab="contact">Contact</a></li>
+    <li><a href="javascript:void(0)" data-tab="prestations" onclick="showTab('prestations')">Prestations</a></li>
+    <li><a href="javascript:void(0)" data-tab="menu" onclick="showTab('menu')">Menu</a></li>
+    <li><a href="javascript:void(0)" data-tab="produits" onclick="showTab('produits')">Produits</a></li>
+    <li><a href="javascript:void(0)" data-tab="galerie" onclick="showTab('galerie')">Galerie</a></li>
+    <li><a href="javascript:void(0)" data-tab="contact" onclick="showTab('contact')">Contact</a></li>
   </ul>
   <div class="nav-right">
     <span class="nav-user" id="nav-user-area" style="display:none"></span>
@@ -555,7 +555,7 @@ section[id].tab-active {
     <h1 class="hero-main-title">Ness<em>Traiteur</em></h1>
     <div class="hero-sep"></div>
     <p class="hero-tagline">Cuisine orientale sublimée</p>
-    <a href="#prestations" class="btn-primary">Découvrir</a>
+    <a href="javascript:void(0)" class="btn-primary" onclick="showTab('prestations')">Découvrir</a>
   </div>
 </section>
 
