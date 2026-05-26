@@ -1528,12 +1528,13 @@ if(session){updateNavForUser(session)}
     <div class="f-group"><label class="f-label">Code postal</label>
       <select class="f-input" id="order-cp" onchange="updateDelivery()">
         <option value="">Sélectionner votre zone...</option>
-        <option value="zone1" data-fee="14.90">Zone 1 — 14,90 €</option>
-        <option value="zone2" data-fee="16.40">Zone 2 — 16,40 €</option>
-        <option value="zone3" data-fee="22.35">Zone 3 — 22,35 €</option>
-        <option value="zone4" data-fee="29.80">Zone 4 — 29,80 €</option>
+        <option value="zone1" data-fee="14.90">Zone 1 — 14,90 € (75001 à 75012, 75013 à 75020)</option>
+        <option value="zone2" data-fee="16.40">Zone 2 — 16,40 € (75007, 75015, 75016, Bois de Boulogne/Vincennes)</option>
+        <option value="zone3" data-fee="22.35">Zone 3 — 22,35 € (92, 93, 94 — petite couronne)</option>
+        <option value="zone4" data-fee="29.80">Zone 4 — 29,80 € (grande couronne)</option>
         <option value="retrait" data-fee="0">Retrait sur place — Gratuit</option>
       </select>
+    <div style="font-size:0.72rem;color:var(--text-light);margin-top:0.4rem">❓ <a href="https://springare.paris" target="_blank" style="color:var(--gold)">Voir la carte des zones de livraison</a></div>
     </div>
     <div id="delivery-info" style="display:none;background:var(--nude-2);padding:0.75rem 1rem;font-size:0.82rem;border-left:3px solid var(--gold);margin-bottom:0.5rem">
       <div style="display:flex;justify-content:space-between"><span>Sous-total commande</span><span id="di-subtotal">—</span></div>
