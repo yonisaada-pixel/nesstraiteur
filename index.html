@@ -390,6 +390,20 @@ section[id].tab-active.hero {
 @media(max-width:900px){
   #cart-panel{width:100%;right:-100%}
 }
+
+/* ===== GRILLE COMMANDE ===== */
+.commande-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.commande-card{background:var(--white);border:1px solid var(--nude-2);padding:1.2rem;display:flex;flex-direction:column;gap:0.6rem;transition:box-shadow 0.3s}
+.commande-card:hover{box-shadow:0 4px 20px rgba(61,46,30,0.1)}
+.commande-card-cat{font-size:0.62rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold)}
+.commande-card-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:var(--warm-dark);line-height:1.3}
+.commande-card-desc{font-size:0.75rem;color:var(--text-light);line-height:1.5;flex:1}
+.commande-card-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem}
+.commande-card-price{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);font-style:italic}
+.commande-add-btn{background:var(--warm-dark);border:none;color:var(--nude-1);padding:0.5rem 1rem;font-family:'Jost',sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;display:flex;align-items:center;gap:0.4rem}
+.commande-add-btn:hover{background:var(--gold)}
+@media(max-width:900px){.commande-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.commande-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -585,8 +599,8 @@ section[id].tab-active.hero {
   <a class="nav-logo" href="javascript:void(0)" onclick="showTab('accueil')">Ness <span>Traiteur</span></a>
   <ul class="nav-center">
     <li><a href="javascript:void(0)" data-tab="prestations" onclick="showTab('prestations')">Prestations</a></li>
-    <li><a href="javascript:void(0)" data-tab="menu" onclick="showTab('menu')">Menu</a></li>
-    <li><a href="javascript:void(0)" data-tab="produits" onclick="showTab('produits')">Produits</a></li>
+    
+    <li><a href="javascript:void(0)" data-tab="produits" onclick="showTab('produits')">Commander</a></li>
     <li><a href="javascript:void(0)" data-tab="galerie" onclick="showTab('galerie')">Galerie</a></li>
     <li><a href="javascript:void(0)" data-tab="contact" onclick="showTab('contact')">Contact</a></li>
   </ul>
@@ -600,7 +614,7 @@ section[id].tab-active.hero {
 <div class="nav-links-mobile" id="mobileNav">
   <button onclick="toggleMobileNav()" style="position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text)">✕</button>
   <a href="#prestations" onclick="toggleMobileNav()">Prestations</a>
-  <a href="#menu" onclick="toggleMobileNav()">Menu</a>
+  
   <a href="#galerie" onclick="toggleMobileNav()">Galerie</a>
   <a href="#contact" onclick="toggleMobileNav()">Contact</a>
   <a href="#" onclick="toggleMobileNav();openModal('loginModal')">Connexion</a>
@@ -671,457 +685,27 @@ section[id].tab-active.hero {
 
 <!-- PRODUITS -->
 <section class="section produits" id="produits">
-  <p class="section-eyebrow">Nos créations</p>
-  <h2 class="section-title">Nos produits</h2>
-  <p class="produits-intro">Découvrez nos préparations maison. Cliquez sur une catégorie pour filtrer.</p>
+  <p class="section-eyebrow">Notre sélection</p>
+  <h2 class="section-title">Commander en ligne</h2>
+  <p class="produits-intro">Choisissez vos plats, ajoutez-les au panier et passez commande. Livraison en Île-de-France.</p>
 
   <!-- Filtres catégories -->
   <div class="produits-cats" id="produits-cats">
-    <button class="produit-cat-btn active" onclick="filterProduits('tous',this)">Tous</button>
-    <button class="produit-cat-btn" onclick="filterProduits('plats',this)">Plats</button>
-    <button class="produit-cat-btn" onclick="filterProduits('quiches',this)">Quiches</button>
-    <button class="produit-cat-btn" onclick="filterProduits('couscous',this)">Avec couscous</button>
-    <button class="produit-cat-btn" onclick="filterProduits('salades',this)">Salades</button>
-    <button class="produit-cat-btn" onclick="filterProduits('desserts',this)">Desserts</button>
-    <button class="produit-cat-btn" onclick="filterProduits('boissons',this)">Boissons</button>
+    <button class="produit-cat-btn active" onclick="filterCommande('plats',this)">Plats</button>
+    <button class="produit-cat-btn" onclick="filterCommande('quiches',this)">Quiches</button>
+    <button class="produit-cat-btn" onclick="filterCommande('couscous',this)">Avec couscous</button>
+    <button class="produit-cat-btn" onclick="filterCommande('supplements',this)">Suppléments</button>
+    <button class="produit-cat-btn" onclick="filterCommande('salades',this)">Salades</button>
+    <button class="produit-cat-btn" onclick="filterCommande('desserts',this)">Desserts</button>
+    <button class="produit-cat-btn" onclick="filterCommande('boissons',this)">Boissons</button>
+    <button class="produit-cat-btn" onclick="filterCommande('vins',this)">Vins</button>
   </div>
 
-  <!-- Grille produits -->
-  <div class="produits-grid" id="produits-grid">
+  <!-- Note -->
+  <div class="menu-note-top" style="margin-bottom:2rem">★ Plats servis pour 2 personnes — Salades en portions de 250g</div>
 
-    <!-- PLATS -->
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍗</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Cuisses de poulet</div>
-        <div class="produit-desc">Servi avec Pommes De Terre — pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥩</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Shnitzel</div>
-        <div class="produit-desc">Avec Pommes De Terre ou haricots — pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍗</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Beignet de poulet</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">20,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🐟</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Saumon hlemi</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">18,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥘</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Bœuf bourguignon</div>
-        <div class="produit-desc">Servi avec du riz — pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍖</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Nikkitouche</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍜</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Nouilles aux légumes</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">12,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="plats">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🧆</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Plats</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Plats</div>
-        <div class="produit-name">Boulette à l'unité</div>
-        <div class="produit-desc">À l'unité</div>
-        <div class="produit-price">5,00 €</div>
-      </div>
-    </div>
-
-    <!-- QUICHES -->
-    <div class="produit-card" data-cat="quiches">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥧</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Quiches</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Quiches</div>
-        <div class="produit-name">Quiche légumes</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">17,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="quiches">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥧</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Quiches</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Quiches</div>
-        <div class="produit-name">Quiche thon</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">17,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="quiches">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥧</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Quiches</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Quiches</div>
-        <div class="produit-name">Quiche saumon</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">17,50 €</div>
-      </div>
-    </div>
-
-    <!-- COUSCOUS -->
-    <div class="produit-card" data-cat="couscous">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🫕</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Avec couscous</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Avec couscous</div>
-        <div class="produit-name">Pkaila</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="couscous">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🫕</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Avec couscous</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Avec couscous</div>
-        <div class="produit-name">Bouillon légumes & viande</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="couscous">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🫕</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Avec couscous</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Avec couscous</div>
-        <div class="produit-name">Blé tunisien</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="couscous">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🫕</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Avec couscous</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Avec couscous</div>
-        <div class="produit-name">Loubia au boeuf</div>
-        <div class="produit-desc">Pour 2 personnes</div>
-        <div class="produit-price">24,00 €</div>
-      </div>
-    </div>
-
-    <!-- SALADES -->
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥗</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Mechouia douce</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">6,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🌶️</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Mechouia piquante</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">6,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥗</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Pomme de terre harissa</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">4,70 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥗</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Salade de betteraves</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">4,70 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥕</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Carottes au cumin</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">4,70 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥗</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Taboulé</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">4,70 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🌿</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Fèves au cumin</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">6,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="salades">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🫒</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Salades</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Salades</div>
-        <div class="produit-name">Artichauts citron harissa</div>
-        <div class="produit-desc">250g</div>
-        <div class="produit-price">6,00 €</div>
-      </div>
-    </div>
-
-    <!-- DESSERTS -->
-    <div class="produit-card" data-cat="desserts">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍰</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Desserts</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Desserts</div>
-        <div class="produit-name">Tarte aux fruits</div>
-        <div class="produit-desc">Fraîcheur & gourmandise</div>
-        <div class="produit-price">7,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="desserts">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍫</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Desserts</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Desserts</div>
-        <div class="produit-name">Mousse au chocolat</div>
-        <div class="produit-desc">Onctueuse & légère</div>
-        <div class="produit-price">7,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="desserts">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍮</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Desserts</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Desserts</div>
-        <div class="produit-name">Tiramisu</div>
-        <div class="produit-desc">Fait maison</div>
-        <div class="produit-price">8,50 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="desserts">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🍪</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Desserts</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Desserts</div>
-        <div class="produit-name">Cookie fourré chocolat</div>
-        <div class="produit-desc">Grand Format</div>
-        <div class="produit-price">16,00 €</div>
-      </div>
-    </div>
-
-    <!-- BOISSONS -->
-    <div class="produit-card" data-cat="boissons">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">💧</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Boissons</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Boissons</div>
-        <div class="produit-name">Eau minérale</div>
-        <div class="produit-desc">Fraîche et désaltérante</div>
-        <div class="produit-price">3,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="boissons">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥤</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Boissons</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Boissons</div>
-        <div class="produit-name">Coca-Cola</div>
-        <div class="produit-desc">Original ou Zéro</div>
-        <div class="produit-price">3,00 €</div>
-      </div>
-    </div>
-
-    <div class="produit-card" data-cat="boissons">
-      <div class="produit-img-placeholder">
-        <div class="produit-ph-icon">🥤</div>
-        <div class="produit-ph-text">Photo à venir</div>
-        <div class="produit-ph-badge">Boissons</div>
-      </div>
-      <div class="produit-body">
-        <div class="produit-cat-tag">Boissons</div>
-        <div class="produit-name">Jus de Raisin</div>
-        <div class="produit-desc">Vin Dolcemente ou Moscato</div>
-        <div class="produit-price">8,90 €</div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Message upload photos -->
-  <div style="text-align:center;margin-top:3rem;padding:2rem;background:var(--nude-2);border-left:3px solid var(--gold)">
-    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:0.5rem">📸 <strong style="color:var(--warm-dark)">Vos photos arrivent bientôt !</strong></p>
-    <p style="font-size:0.8rem;color:var(--text-light)">Connectez-vous en admin pour ajouter les vraies photos de vos plats.</p>
-  </div>
+  <!-- Grille commande -->
+  <div class="commande-grid" id="commande-grid"></div>
 </section>
 
 <!-- GALERIE -->
@@ -1201,6 +785,7 @@ function showTab(tabName) {
   // Montrer la section voulue
   const target = document.getElementById(tabName);
   if (target) target.classList.add('tab-active');
+  if (tabName === 'produits') setTimeout(renderCommandeGrid, 50);
   // Mettre à jour les liens nav actifs
   document.querySelectorAll('.nav-center a[data-tab]').forEach(a => {
     a.classList.remove('nav-tab-active');
@@ -1694,6 +1279,7 @@ function addToCart(name, price, priceNum){
   else { cart.push({name, price, priceNum, qty:1}); }
   saveCart();
   renderCart();
+  renderCommandeGrid();
   showCartNotif(name);
 }
 
@@ -1789,6 +1375,10 @@ function submitOrder(){
   if(!name || !tel || !email || !address){ alert('Veuillez remplir tous les champs obligatoires.'); return; }
   
   const totalAmount = cart.reduce((s,i)=>s+(i.priceNum*i.qty), 0);
+  const select = document.getElementById('order-cp');
+  const deliveryZone = select ? select.options[select.selectedIndex]?.text || '' : '';
+  const deliveryFee = select ? parseFloat(select.options[select.selectedIndex]?.dataset?.fee || 0) : 0;
+  const grandTotal = totalAmount + deliveryFee;
   const items = cart.map(i=>`${i.qty}× ${i.name} (${i.price})`).join(', ');
   
   // Sauvegarder dans messages admin
@@ -1796,7 +1386,7 @@ function submitOrder(){
   msgs.push({
     name, email, tel,
     event: 'Commande en ligne',
-    msg: 'COMMANDE: ' + items + ' | TOTAL: ' + totalAmount.toFixed(2) + '€ | LIVRAISON: ' + address + (document.getElementById('order-datetime').value ? ' | DATE: ' + document.getElementById('order-datetime').value : ''),
+    msg: 'COMMANDE: ' + items + ' | SOUS-TOTAL: ' + totalAmount.toFixed(2) + '€ | LIVRAISON: ' + deliveryZone + ' | FRAIS: ' + deliveryFee.toFixed(2) + '€ | TOTAL: ' + grandTotal.toFixed(2) + '€ | ADRESSE: ' + address + (document.getElementById('order-datetime').value ? ' | DATE: ' + document.getElementById('order-datetime').value : ''),
     guests: cart.reduce((s,i)=>s+i.qty,0),
     date: new Date().toLocaleDateString('fr-FR'),
     dateStr: new Date().toLocaleDateString('fr-FR'),
@@ -1814,6 +1404,62 @@ function submitOrder(){
 
 // Init panier au chargement
 renderCart();
+
+
+// ===== GRILLE COMMANDE =====
+let currentCommandeCat = 'plats';
+
+function filterCommande(cat, btn){
+  currentCommandeCat = cat;
+  document.querySelectorAll('.produit-cat-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCommandeGrid();
+}
+
+function renderCommandeGrid(){
+  const menu = getMenu();
+  const items = menu[currentCommandeCat] || [];
+  const catLabels = {
+    plats:'Plats', quiches:'Quiches', couscous:'Avec couscous',
+    supplements:'Suppléments', salades:'Salades', desserts:'Desserts',
+    boissons:'Boissons', vins:'Vins'
+  };
+  const catLabel = catLabels[currentCommandeCat] || currentCommandeCat;
+  const grid = document.getElementById('commande-grid');
+  if(!grid) return;
+  if(items.length === 0){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-light);font-size:0.85rem">Aucun article dans cette catégorie.</div>';
+    return;
+  }
+  grid.innerHTML = items.map(item => {
+    const priceNum = parseFloat(item.price.replace(',','.').replace(/[^0-9.]/g,'')) || 0;
+    const safeName = item.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    const safePrice = item.price.replace(/'/g,"\\'");
+    return `<div class="commande-card">
+      <div class="commande-card-cat">${catLabel}</div>
+      <div class="commande-card-name">${item.name}</div>
+      <div class="commande-card-desc">${item.desc||''}</div>
+      <div class="commande-card-bottom">
+        <div class="commande-card-price">${item.price}</div>
+        <button class="commande-add-btn" onclick="addToCart('${safeName}','${safePrice}',${priceNum})">+ Ajouter</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateDelivery(){
+  const select = document.getElementById('order-cp');
+  const info = document.getElementById('delivery-info');
+  if(!select || !select.value){ if(info) info.style.display='none'; return; }
+  const opt = select.options[select.selectedIndex];
+  const fee = parseFloat(opt.dataset.fee) || 0;
+  const subtotal = cart.reduce((s,i)=>s+(i.priceNum*i.qty), 0);
+  const total = subtotal + fee;
+  document.getElementById('di-subtotal').textContent = subtotal.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('di-delivery').textContent = fee === 0 ? 'Gratuit' : fee.toFixed(2).replace('.',',') + ' €';
+  document.getElementById('di-total').textContent = total.toFixed(2).replace('.',',') + ' €';
+  info.style.display = 'block';
+}
 
 // ===== INIT =====
 renderMenuContent();
@@ -1878,7 +1524,21 @@ if(session){updateNavForUser(session)}
       <div class="f-group"><label class="f-label">Téléphone</label><input class="f-input" id="order-tel" placeholder="06 00 00 00 00"></div>
     </div>
     <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" id="order-email" placeholder="marie@exemple.fr"></div>
-    <div class="f-group"><label class="f-label">Adresse de livraison</label><input class="f-input" id="order-address" placeholder="12 rue de la Paix, 75001 Paris"></div>
+    <div class="f-group"><label class="f-label">Adresse de livraison</label><input class="f-input" id="order-address" placeholder="12 rue de la Paix, 75001 Paris" oninput="updateDelivery()"></div>
+    <div class="f-group"><label class="f-label">Code postal</label>
+      <select class="f-input" id="order-cp" onchange="updateDelivery()">
+        <option value="">Sélectionner votre zone...</option>
+        <option value="paris" data-fee="5">Paris (75) — 5,00 €</option>
+        <option value="idf1" data-fee="8">Petite couronne 92/93/94 — 8,00 €</option>
+        <option value="idf2" data-fee="12">Grande couronne 77/78/91/95 — 12,00 €</option>
+        <option value="retrait" data-fee="0">Retrait sur place — Gratuit</option>
+      </select>
+    </div>
+    <div id="delivery-info" style="display:none;background:var(--nude-2);padding:0.75rem 1rem;font-size:0.82rem;border-left:3px solid var(--gold);margin-bottom:0.5rem">
+      <div style="display:flex;justify-content:space-between"><span>Sous-total commande</span><span id="di-subtotal">—</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Frais de livraison</span><span id="di-delivery">—</span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:600;margin-top:0.4rem;font-size:0.9rem;color:var(--warm-dark)"><span>Total à payer</span><span id="di-total">—</span></div>
+    </div>
     <div class="f-group"><label class="f-label">Date & heure souhaitée</label><input class="f-input" type="datetime-local" id="order-datetime"></div>
     <div class="f-group"><label class="f-label">Message (optionnel)</label><textarea class="f-input" id="order-msg" rows="2" placeholder="Allergies, instructions particulières..."></textarea></div>
     <button class="btn-gold" onclick="submitOrder()">✓ Confirmer la commande</button>
