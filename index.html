@@ -1580,7 +1580,7 @@ const ZONE_INFO = {
   4: { name:'Zone 4 — Grande Couronne', price:'29,80 €', fee:29.80, desc:'77 Seine-et-Marne · 78 Yvelines · 91 Essonne · 95 Val-d\'Oise', color:'var(--warm-dark)' },
 };
 
-let _zoneTimer = null;
+var _zoneTimer = null;
 
 function detectZone(address) {
   clearTimeout(_zoneTimer);
@@ -1641,7 +1641,7 @@ function showZoneResult(cp) {
   error.style.display = 'none';
 
   // Détecter la zone
-  let zone = ZONES_MAP[cp];
+  var zone = ZONES_MAP[cp];
   // Si pas trouvé exactement, chercher par département
   if (!zone) {
     const dept = cp.substring(0, 2);
