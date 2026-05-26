@@ -1648,7 +1648,7 @@ function showZoneResult(cp) {
     if (['75'].includes(dept)) zone = 1;
     else if (['92','93','94'].includes(dept)) zone = 3;
     else if (['77','78','91','95'].includes(dept)) zone = 4;
-    else { showZoneError('Ce code postal (' + cp + ') n'est pas dans notre zone de livraison.'); return; }
+    else { showZoneError("Ce code postal (" + cp + ") n'est pas dans notre zone de livraison."); return; }
   }
 
   const info = ZONE_INFO[zone];
