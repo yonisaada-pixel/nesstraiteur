@@ -1529,14 +1529,146 @@ function updateDelivery(){
   const select = document.getElementById('order-cp');
   const info = document.getElementById('delivery-info');
   if(!select || !select.value){ if(info) info.style.display='none'; return; }
-  const opt = select.options[select.selectedIndex];
-  const fee = parseFloat(opt.dataset.fee) || 0;
+  const fee = parseFloat(select.dataset.fee || select.value === 'retrait' ? 0 : select.dataset.fee) || 0;
   const subtotal = cart.reduce((s,i)=>s+(i.priceNum*i.qty), 0);
   const total = subtotal + fee;
   document.getElementById('di-subtotal').textContent = subtotal.toFixed(2).replace('.',',') + ' €';
   document.getElementById('di-delivery').textContent = fee === 0 ? 'Gratuit' : fee.toFixed(2).replace('.',',') + ' €';
   document.getElementById('di-total').textContent = total.toFixed(2).replace('.',',') + ' €';
   info.style.display = 'block';
+}
+
+
+// ===== DÉTECTION ZONE PAR CODE POSTAL =====
+
+// Mapping codes postaux → zones
+const ZONES_MAP = {
+  // Zone 1 : Paris (sauf 75007, 75016)
+  '75001':1,'75002':1,'75003':1,'75004':1,'75005':1,'75006':1,
+  '75008':1,'75009':1,'75010':1,'75011':1,'75012':1,'75013':1,
+  '75014':1,'75015':1,'75017':1,'75018':1,'75019':1,'75020':1,
+  // Zone 2 : Paris Ouest & Bois
+  '75007':2,'75016':2,
+  // Zone 3 : Petite couronne 92, 93, 94
+  '92100':3,'92110':3,'92120':3,'92130':3,'92140':3,'92150':3,
+  '92160':3,'92170':3,'92190':3,'92200':3,'92210':3,'92220':3,
+  '92230':3,'92240':3,'92250':3,'92260':3,'92270':3,'92290':3,
+  '92300':3,'92310':3,'92320':3,'92330':3,'92340':3,'92350':3,
+  '92360':3,'92370':3,'92380':3,'92390':3,'92400':3,'92410':3,
+  '92420':3,'92430':3,'92500':3,'92600':3,'92700':3,'92800':3,
+  '93100':3,'93110':3,'93120':3,'93130':3,'93140':3,'93150':3,
+  '93160':3,'93170':3,'93190':3,'93200':3,'93210':3,'93220':3,
+  '93230':3,'93240':3,'93250':3,'93260':3,'93270':3,'93300':3,
+  '93310':3,'93320':3,'93330':3,'93340':3,'93350':3,'93360':3,
+  '93370':3,'93380':3,'93390':3,'93400':3,'93410':3,'93420':3,
+  '93430':3,'93440':3,'93450':3,'93460':3,'93470':3,'93500':3,
+  '93600':3,'93700':3,'93800':3,
+  '94100':3,'94110':3,'94120':3,'94130':3,'94140':3,'94150':3,
+  '94160':3,'94170':3,'94190':3,'94200':3,'94210':3,'94220':3,
+  '94230':3,'94240':3,'94250':3,'94260':3,'94270':3,'94290':3,
+  '94300':3,'94310':3,'94320':3,'94340':3,'94350':3,'94360':3,
+  '94370':3,'94380':3,'94390':3,'94400':3,'94410':3,'94420':3,
+  '94430':3,'94440':3,'94450':3,'94460':3,'94470':3,'94480':3,
+  '94490':3,'94500':3,'94510':3,'94520':3,'94550':3,'94600':3,
+  '94700':3,'94800':3,
+};
+
+const ZONE_INFO = {
+  1: { name:'Zone 1 — Paris Centre', price:'14,90 €', fee:14.90, desc:'75001 à 75006 · 75008 à 75015 · 75017 à 75020', color:'var(--warm-dark)' },
+  2: { name:'Zone 2 — Paris Ouest', price:'16,40 €', fee:16.40, desc:'75007 · 75016 · Bois de Boulogne · Bois de Vincennes', color:'var(--warm-dark)' },
+  3: { name:'Zone 3 — Petite Couronne', price:'22,35 €', fee:22.35, desc:'92 Hauts-de-Seine · 93 Seine-Saint-Denis · 94 Val-de-Marne', color:'var(--warm-dark)' },
+  4: { name:'Zone 4 — Grande Couronne', price:'29,80 €', fee:29.80, desc:'77 Seine-et-Marne · 78 Yvelines · 91 Essonne · 95 Val-d\'Oise', color:'var(--warm-dark)' },
+};
+
+let _zoneTimer = null;
+
+function detectZone(address) {
+  clearTimeout(_zoneTimer);
+  const result = document.getElementById('zone-result');
+  const error = document.getElementById('zone-error');
+  result.style.display = 'none';
+  error.style.display = 'none';
+  document.getElementById('order-cp').value = '';
+
+  if (!address || address.length < 5) return;
+
+  // Chercher un code postal dans l'adresse (5 chiffres)
+  const cpMatch = address.match(/\b(75|77|78|91|92|93|94|95)\d{3}\b/);
+  if (cpMatch) {
+    const cp = cpMatch[0];
+    showZoneResult(cp);
+    return;
+  }
+
+  // Sinon attendre 800ms puis chercher via nominatim (gratuit, pas de clé)
+  _zoneTimer = setTimeout(() => fetchZoneFromAddress(address), 800);
+}
+
+function fetchZoneFromAddress(address) {
+  const query = encodeURIComponent(address + ', France');
+  fetch('https://nominatim.openstreetmap.org/search?q=' + query + '&format=json&limit=1&countrycodes=fr', {
+    headers: { 'Accept-Language': 'fr' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data || data.length === 0) {
+      showZoneError('Adresse non trouvée. Vérifiez et réessayez.');
+      return;
+    }
+    const place = data[0];
+    // Récupérer les détails pour avoir le postcode
+    return fetch('https://nominatim.openstreetmap.org/details?place_id=' + place.place_id + '&addressdetails=1&format=json')
+      .then(r => r.json())
+      .then(detail => {
+        const addr = detail.address || {};
+        const cp = addr.postcode || '';
+        if (cp) {
+          showZoneResult(cp.replace(/\s/g,'').substring(0,5));
+        } else {
+          // Essayer de trouver dans display_name
+          const cpFallback = place.display_name.match(/\b(75|77|78|91|92|93|94|95)\d{3}\b/);
+          if (cpFallback) showZoneResult(cpFallback[0]);
+          else showZoneError('Zone non détectée. Incluez le code postal dans votre adresse.');
+        }
+      });
+  })
+  .catch(() => showZoneError('Impossible de détecter la zone. Ajoutez votre code postal.'));
+}
+
+function showZoneResult(cp) {
+  const result = document.getElementById('zone-result');
+  const error = document.getElementById('zone-error');
+  error.style.display = 'none';
+
+  // Détecter la zone
+  let zone = ZONES_MAP[cp];
+  // Si pas trouvé exactement, chercher par département
+  if (!zone) {
+    const dept = cp.substring(0, 2);
+    if (['75'].includes(dept)) zone = 1;
+    else if (['92','93','94'].includes(dept)) zone = 3;
+    else if (['77','78','91','95'].includes(dept)) zone = 4;
+    else { showZoneError('Ce code postal (' + cp + ') n'est pas dans notre zone de livraison.'); return; }
+  }
+
+  const info = ZONE_INFO[zone];
+  document.getElementById('zone-name').textContent = info.name;
+  document.getElementById('zone-price').textContent = info.price;
+  document.getElementById('zone-desc').textContent = cp + ' — ' + info.desc;
+  document.getElementById('order-cp').value = 'zone' + zone;
+  document.getElementById('order-cp').dataset.fee = info.fee;
+  result.style.display = 'block';
+
+  // Mettre à jour le récap livraison
+  updateDelivery();
+}
+
+function showZoneError(msg) {
+  const error = document.getElementById('zone-error');
+  error.textContent = '⚠️ ' + msg;
+  error.style.display = 'block';
+  document.getElementById('order-cp').value = '';
+  document.getElementById('zone-result').style.display = 'none';
 }
 
 // ===== INIT =====
