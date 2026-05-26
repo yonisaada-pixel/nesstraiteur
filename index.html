@@ -404,6 +404,25 @@ section[id].tab-active.hero {
 .commande-add-btn:hover{background:var(--gold)}
 @media(max-width:900px){.commande-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.commande-grid{grid-template-columns:1fr}}
+
+/* ===== LIVRAISON ===== */
+.livraison-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem;margin-bottom:3rem}
+.livraison-card{background:var(--white);border:1px solid var(--nude-2);padding:2rem 1.5rem;position:relative;text-align:center;transition:box-shadow 0.3s}
+.livraison-card:hover{box-shadow:0 8px 32px rgba(61,46,30,0.12)}
+.livraison-zone-badge{display:inline-block;padding:0.3rem 1rem;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;font-family:'Jost',sans-serif;margin-bottom:1rem;border-radius:2px}
+.livraison-card.zone1 .livraison-zone-badge{background:#f5f0e8;color:var(--warm-dark);border:1px solid var(--nude-3)}
+.livraison-card.zone2 .livraison-zone-badge{background:#f0ede5;color:var(--warm-dark);border:1px solid var(--nude-3)}
+.livraison-card.zone3 .livraison-zone-badge{background:var(--warm-dark);color:var(--nude-1)}
+.livraison-card.zone4 .livraison-zone-badge{background:var(--gold);color:white}
+.livraison-card.retrait .livraison-zone-badge{background:#166534;color:white}
+.livraison-price{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;color:var(--warm-dark);line-height:1;margin-bottom:0.5rem}
+.livraison-card.retrait .livraison-price{font-size:1.6rem;color:#166534}
+.livraison-label{font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.livraison-codes{font-size:0.78rem;color:var(--text-light);line-height:1.7}
+.livraison-info{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;background:var(--nude-2);padding:1.5rem;border-left:3px solid var(--gold)}
+.livraison-info-item{font-size:0.82rem;color:var(--text-light)}
+@media(max-width:900px){.livraison-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.livraison-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -601,6 +620,7 @@ section[id].tab-active.hero {
     <li><a href="javascript:void(0)" data-tab="prestations" onclick="showTab('prestations')">Prestations</a></li>
     
     <li><a href="javascript:void(0)" data-tab="produits" onclick="showTab('produits')">Commander</a></li>
+    <li><a href="javascript:void(0)" data-tab="livraison" onclick="showTab('livraison')">Livraison</a></li>
     <li><a href="javascript:void(0)" data-tab="galerie" onclick="showTab('galerie')">Galerie</a></li>
     <li><a href="javascript:void(0)" data-tab="contact" onclick="showTab('contact')">Contact</a></li>
   </ul>
@@ -615,6 +635,7 @@ section[id].tab-active.hero {
   <button onclick="toggleMobileNav()" style="position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text)">✕</button>
   <a href="#prestations" onclick="toggleMobileNav()">Prestations</a>
   
+  <a href="javascript:void(0)" onclick="toggleMobileNav();showTab('livraison')">Livraison</a>
   <a href="#galerie" onclick="toggleMobileNav()">Galerie</a>
   <a href="#contact" onclick="toggleMobileNav()">Contact</a>
   <a href="#" onclick="toggleMobileNav();openModal('loginModal')">Connexion</a>
@@ -706,6 +727,63 @@ section[id].tab-active.hero {
 
   <!-- Grille commande -->
   <div class="commande-grid" id="commande-grid"></div>
+</section>
+
+<section class="section" id="livraison">
+  <p class="section-eyebrow">Zones & tarifs</p>
+  <h2 class="section-title">Livraison en Île-de-France</h2>
+  <p class="section-subtitle">Nous livrons vos commandes dans toute l'Île-de-France. Sélectionnez votre zone pour connaître les frais applicables.</p>
+
+  <!-- Grille des zones -->
+  <div class="livraison-grid">
+
+    <div class="livraison-card zone1">
+      <div class="livraison-zone-badge">Zone 1</div>
+      <div class="livraison-price">14,90 €</div>
+      <div class="livraison-label">Paris Centre</div>
+      <div class="livraison-codes">75001 · 75002 · 75003 · 75004 · 75005 · 75006 · 75008 · 75009 · 75010 · 75011 · 75012 · 75013 · 75014 · 75015 · 75016 · 75017 · 75018 · 75019 · 75020</div>
+    </div>
+
+    <div class="livraison-card zone2">
+      <div class="livraison-zone-badge">Zone 2</div>
+      <div class="livraison-price">16,40 €</div>
+      <div class="livraison-label">Paris Ouest & Bois</div>
+      <div class="livraison-codes">75007 · 75016 · Bois de Boulogne · Bois de Vincennes</div>
+    </div>
+
+    <div class="livraison-card zone3">
+      <div class="livraison-zone-badge">Zone 3</div>
+      <div class="livraison-price">22,35 €</div>
+      <div class="livraison-label">Petite Couronne</div>
+      <div class="livraison-codes">92 — Hauts-de-Seine · 93 — Seine-Saint-Denis · 94 — Val-de-Marne</div>
+    </div>
+
+    <div class="livraison-card zone4">
+      <div class="livraison-zone-badge">Zone 4</div>
+      <div class="livraison-price">29,80 €</div>
+      <div class="livraison-label">Grande Couronne</div>
+      <div class="livraison-codes">77 — Seine-et-Marne · 78 — Yvelines · 91 — Essonne · 95 — Val-d'Oise</div>
+    </div>
+
+    <div class="livraison-card retrait">
+      <div class="livraison-zone-badge">Retrait</div>
+      <div class="livraison-price">Gratuit</div>
+      <div class="livraison-label">Sur place</div>
+      <div class="livraison-codes">Retrait disponible à notre point de préparation — sur rendez-vous</div>
+    </div>
+
+  </div>
+
+  <!-- Info commande min -->
+  <div class="livraison-info">
+    <div class="livraison-info-item">🕐 Délai de préparation : 24h minimum</div>
+    <div class="livraison-info-item">📦 Commande minimum : nous contacter</div>
+    <div class="livraison-info-item">📞 Besoin d'un devis ? <a href="javascript:void(0)" onclick="showTab('contact')" style="color:var(--gold)">Contactez-nous</a></div>
+  </div>
+
+  <div style="text-align:center;margin-top:3rem">
+    <a href="javascript:void(0)" class="btn-primary" onclick="showTab('produits')">Commander maintenant →</a>
+  </div>
 </section>
 
 <!-- GALERIE -->
