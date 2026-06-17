@@ -1941,7 +1941,7 @@ function populatePlatSelect(){
     group.label = label;
     (menu[cat]||[]).forEach(item => {
       const opt = document.createElement('option');
-      opt.value = cat + '__' + item.name;
+      opt.value = cat + '_' + item.name;
       opt.textContent = item.name;
       group.appendChild(opt);
     });
@@ -1956,7 +1956,7 @@ function saveItemPhoto(){
   if(!select.value){ alert('Veuillez sélectionner un plat.'); return; }
   
   const photos = getItemPhotos();
-  const key = select.value.replace('__', '_');
+  const key = select.value;
   photos[key] = _photoFileData;
   localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
   
