@@ -1644,7 +1644,7 @@ function renderCommandeGrid(){
     const priceNum = parseFloat(item.price.replace(',','.').replace(/[^0-9.]/g,'')) || 0;
     const safeName = item.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     const safePrice = item.price.replace(/'/g,"\\'");
-    const photoKey = currentCommandeCat + '_' + item.name;
+    const photoKey = currentCommandeCat + '|||' + item.name;
     const photo = photos[photoKey];
     const isAdmin = checkAdminSession ? checkAdminSession() : false;
     const photoHtml = photo
@@ -1944,7 +1944,7 @@ function populatePlatSelect(){
     group.label = label;
     (menu[cat]||[]).forEach(item => {
       const opt = document.createElement('option');
-      opt.value = cat + '_' + item.name;
+      opt.value = cat + '|||' + item.name;
       opt.textContent = item.name;
       group.appendChild(opt);
     });
@@ -1959,7 +1959,7 @@ function saveItemPhoto(){
   if(!select.value){ alert('Veuillez sélectionner un plat.'); return; }
   
   const photos = getItemPhotos();
-  const key = select.value;
+  const key = select.value; // format: cat|||nomPlat
   photos[key] = _photoFileData;
   localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
   // Sauvegarder le nom lisible
@@ -1994,7 +1994,7 @@ function renderPhotoList(){
   // Charger aussi les metadata
   const photoMeta = JSON.parse(localStorage.getItem('ness_item_photos_meta')||'{}');
   grid.innerHTML = keys.map(key => {
-    const label = photoMeta[key] || key;
+    const label = photoMeta[key] || (key.includes('|||') ? key.split('|||')[1] : key);
     return `<div class="photo-list-item">
       <img src="${photos[key]}" alt="${label}">
       <div class="photo-list-item-info">
