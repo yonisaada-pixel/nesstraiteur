@@ -1204,11 +1204,14 @@ function doAdminLogin(){
   closeModal('adminModal');closeModal('loginModal');
   document.getElementById('admin-panel').classList.add('active');
   document.getElementById('main-site').style.display='none';
+  localStorage.setItem('ness_admin_session','1');
   refreshAdminData();
 }
 function closeAdmin(){
   document.getElementById('admin-panel').classList.remove('active');
   document.getElementById('main-site').style.display='block';
+  localStorage.removeItem('ness_admin_session');
+  setTimeout(renderCommandeGrid, 100);
 }
 function adminTab(tab,el){
   document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
@@ -1959,6 +1962,10 @@ function saveItemPhoto(){
   const key = select.value;
   photos[key] = _photoFileData;
   localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
+  // Sauvegarder le nom lisible
+  const meta = JSON.parse(localStorage.getItem('ness_item_photos_meta')||'{}');
+  meta[key] = select.options[select.selectedIndex].text;
+  localStorage.setItem('ness_item_photos_meta', JSON.stringify(meta));
   
   msg.style.display = 'block';
   setTimeout(()=>{ msg.style.display='none'; }, 3000);
@@ -1984,15 +1991,14 @@ function renderPhotoList(){
     return;
   }
   const menu = getMenu();
+  // Charger aussi les metadata
+  const photoMeta = JSON.parse(localStorage.getItem('ness_item_photos_meta')||'{}');
   grid.innerHTML = keys.map(key => {
-    // Retrouver le nom du plat depuis la clé
-    const parts = key.split('_');
-    const cat = parts[0];
-    const name = parts.slice(1).join('_');
+    const label = photoMeta[key] || key;
     return `<div class="photo-list-item">
-      <img src="${photos[key]}" alt="${name}">
+      <img src="${photos[key]}" alt="${label}">
       <div class="photo-list-item-info">
-        <span class="photo-list-item-name" title="${name}">${name}</span>
+        <span class="photo-list-item-name" title="${label}">${label}</span>
         <button class="photo-list-item-del" onclick="deleteItemPhoto('${key.replace(/'/g,"\\'")}')" title="Supprimer">✕</button>
       </div>
     </div>`;
@@ -2004,6 +2010,9 @@ function deleteItemPhoto(key){
   const photos = getItemPhotos();
   delete photos[key];
   localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
+  const meta = JSON.parse(localStorage.getItem('ness_item_photos_meta')||'{}');
+  delete meta[key];
+  localStorage.setItem('ness_item_photos_meta', JSON.stringify(meta));
   renderPhotoList();
   renderCommandeGrid();
 }
