@@ -459,6 +459,17 @@ section[id].tab-active.hero {
 #galerie-grid .galerie-item{aspect-ratio:1;overflow:hidden;background:var(--nude-2)}
 #galerie-grid .galerie-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
 #galerie-grid .galerie-item img:hover{transform:scale(1.05)}
+
+/* ===== PHOTOS CARTES COMMANDER ===== */
+.commande-card-photo{overflow:hidden;border-radius:2px 2px 0 0;position:relative}
+.card-photo-change{position:absolute;bottom:0.4rem;right:0.4rem;background:rgba(0,0,0,0.6);color:white;padding:0.3rem 0.6rem;font-size:0.75rem;cursor:pointer;border-radius:2px}
+.card-photo-change:hover{background:rgba(0,0,0,0.85)}
+.card-photo-change input{display:none}
+.commande-card-photo-empty{display:flex;align-items:center;justify-content:center;gap:0.5rem;height:120px;background:var(--nude-2);color:var(--text-light);font-size:0.78rem;cursor:pointer;border:2px dashed var(--nude-3);transition:all 0.2s}
+.commande-card-photo-empty:hover{background:var(--nude-3);color:var(--warm-dark)}
+.commande-card-photo-empty input{display:none}
+.commande-card{padding:0}
+.commande-card > div:last-child{padding:1rem}
 </style>
 </head>
 <body>
@@ -1585,17 +1596,32 @@ function renderCommandeGrid(){
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-light);font-size:0.85rem">Aucun article dans cette catégorie.</div>';
     return;
   }
+  const photos = JSON.parse(localStorage.getItem('ness_item_photos')||'{}');
   grid.innerHTML = items.map(item => {
     const priceNum = parseFloat(item.price.replace(',','.').replace(/[^0-9.]/g,'')) || 0;
     const safeName = item.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     const safePrice = item.price.replace(/'/g,"\\'");
+    const photoKey = currentCommandeCat + '_' + item.name;
+    const photo = photos[photoKey];
+    const isAdmin = checkAdminSession ? checkAdminSession() : false;
+    const photoHtml = photo
+      ? `<div class="commande-card-photo" style="position:relative">
+           <img src="${photo}" alt="${item.name}" style="width:100%;height:160px;object-fit:cover">
+           ${isAdmin ? `<label class="card-photo-change" title="Changer la photo"><input type="file" accept="image/*" style="display:none" onchange="handleItemPhoto(this,'${photoKey}')">📷</label>` : ''}
+         </div>`
+      : isAdmin
+        ? `<label class="commande-card-photo-empty"><input type="file" accept="image/*" style="display:none" onchange="handleItemPhoto(this,'${photoKey}')">📷 Ajouter une photo</label>`
+        : '';
     return `<div class="commande-card">
-      <div class="commande-card-cat">${catLabel}</div>
-      <div class="commande-card-name">${item.name}</div>
-      <div class="commande-card-desc">${item.desc||''}</div>
-      <div class="commande-card-bottom">
-        <div class="commande-card-price">${item.price}</div>
-        <button class="commande-add-btn" onclick="addToCart('${safeName}','${safePrice}',${priceNum})">+ Ajouter</button>
+      ${photoHtml}
+      <div style="padding:1rem">
+        <div class="commande-card-cat">${catLabel}</div>
+        <div class="commande-card-name">${item.name}</div>
+        <div class="commande-card-desc">${item.desc||''}</div>
+        <div class="commande-card-bottom">
+          <div class="commande-card-price">${item.price}</div>
+          <button class="commande-add-btn" onclick="addToCart('${safeName}','${safePrice}',${priceNum})">+ Ajouter</button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1821,6 +1847,29 @@ function renderGalerie(){
       <img src="${p.src}" alt="${p.name}" loading="lazy">
     </div>
   `).join('');
+}
+
+
+// ===== PHOTOS PAR PLAT =====
+var ITEM_PHOTOS_KEY = 'ness_item_photos';
+
+function getItemPhotos(){ try{ return JSON.parse(localStorage.getItem(ITEM_PHOTOS_KEY)||'{}'); }catch{ return {}; } }
+
+function handleItemPhoto(input, key){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const photos = getItemPhotos();
+    photos[key] = e.target.result;
+    localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
+    renderCommandeGrid(); // Rafraîchir
+  };
+  reader.readAsDataURL(file);
+}
+
+function checkAdminSession(){
+  try{ return !!localStorage.getItem('ness_admin_session'); }catch{ return false; }
 }
 
 // ===== INIT =====
