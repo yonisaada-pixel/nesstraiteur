@@ -1630,12 +1630,12 @@ function filterCommande(cat, btn){
 function renderCommandeGrid(){
   const menu = getMenu();
   const items = menu[currentCommandeCat] || [];
-  const catLabels = {
+  var catLabelsMap = {
     plats:'Plats', quiches:'Quiches', couscous:'Avec couscous',
     supplements:'Suppléments', salades:'Salades', desserts:'Desserts',
     boissons:'Boissons', vins:'Vins'
   };
-  const catLabel = catLabels[currentCommandeCat] || currentCommandeCat;
+  var catLabel = catLabelsMap[currentCommandeCat] || currentCommandeCat;
   const grid = document.getElementById('commande-grid');
   if(!grid) return;
   if(items.length === 0){
@@ -1936,10 +1936,10 @@ function populatePlatSelect(){
   const select = document.getElementById('photo-plat-select');
   if(!select) return;
   const menu = getMenu();
-  const catLabels = {plats:'Plats',quiches:'Quiches',couscous:'Avec couscous',supplements:'Suppléments',salades:'Salades',desserts:'Desserts',boissons:'Boissons',vins:'Vins'};
+  var catLabelsMap2 = {plats:'Plats',quiches:'Quiches',couscous:'Avec couscous',supplements:'Suppléments',salades:'Salades',desserts:'Desserts',boissons:'Boissons',vins:'Vins'};
   select.innerHTML = '<option value="">— Sélectionner un plat —</option>';
   Object.keys(menu).forEach(cat => {
-    const label = catLabels[cat] || cat;
+    var label = catLabelsMap2[cat] || cat;
     const group = document.createElement('optgroup');
     group.label = label;
     (menu[cat]||[]).forEach(item => {
