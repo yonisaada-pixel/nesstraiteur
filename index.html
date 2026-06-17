@@ -447,6 +447,18 @@ section[id].tab-active.hero {
   .livraison-layout{grid-template-columns:1fr}
   .livraison-map-wrapper{position:static}
 }
+
+/* ===== GALERIE ADMIN ===== */
+.gallery-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem}
+.gallery-admin-item{position:relative;aspect-ratio:1;background:var(--nude-2);border-radius:2px;overflow:hidden;border:1px solid var(--nude-3)}
+.gallery-admin-item img{width:100%;height:100%;object-fit:cover}
+.gallery-admin-item .del-btn{position:absolute;top:0.4rem;right:0.4rem;width:24px;height:24px;background:rgba(220,38,38,0.85);color:white;border:none;border-radius:50%;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;justify-content:center;line-height:1}
+.gallery-admin-item .del-btn:hover{background:#dc2626}
+.gallery-admin-empty{grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-light);font-size:0.85rem;border:2px dashed var(--nude-3)}
+
+#galerie-grid .galerie-item{aspect-ratio:1;overflow:hidden;background:var(--nude-2)}
+#galerie-grid .galerie-item img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+#galerie-grid .galerie-item img:hover{transform:scale(1.05)}
 </style>
 </head>
 <body>
@@ -508,6 +520,7 @@ section[id].tab-active.hero {
       <button class="admin-nav-btn" onclick="adminTab('menu',this)">Menu</button>
       <button class="admin-nav-btn" onclick="adminTab('messages',this)">Messages</button>
       <button class="admin-nav-btn" onclick="adminTab('produits',this)">📸 Produits</button>
+      <button class="admin-nav-btn" onclick="adminTab('photos',this)">🖼️ Photos</button>
       <button class="admin-nav-btn" onclick="adminTab('settings',this)">Paramètres</button>
     </div>
     <button class="admin-close" onclick="closeAdmin()">✕ Quitter</button>
@@ -567,6 +580,26 @@ section[id].tab-active.hero {
       <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem">Cliquez sur une carte pour uploader ou changer la photo. Les modifications sont sauvegardées automatiquement.</p>
       <div class="admin-produits-grid" id="admin-produits-grid"></div>
       <div class="save-bar"><span>Les photos sont sauvegardées localement dans votre navigateur</span><button class="btn-sm" onclick="renderAdminProduits()">🔄 Actualiser</button></div>
+    </div>
+
+        
+    <!-- PHOTOS GALERIE -->
+    <div class="admin-section" id="admin-photos">
+      <div class="admin-toolbar">
+        <h3 style="margin:0;border:none;padding:0">🖼️ Galerie photos</h3>
+        <label class="btn-sm" style="cursor:pointer">
+          + Ajouter des photos
+          <input type="file" id="gallery-upload-input" multiple accept="image/*" style="display:none" onchange="handleGalleryUpload(this)">
+        </label>
+      </div>
+      <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem">
+        Ajoutez vos photos : elles s'afficheront directement dans la galerie du site. Cliquez sur ✕ pour supprimer une photo.
+      </p>
+      <div class="gallery-admin-grid" id="gallery-admin-grid"></div>
+      <div class="save-bar">
+        <span id="gallery-count-label">0 photo(s) dans la galerie</span>
+        <button class="btn-sm" onclick="clearGallery()" style="background:#dc2626;border-color:#dc2626">🗑️ Tout supprimer</button>
+      </div>
     </div>
 
         <!-- SETTINGS -->
@@ -830,8 +863,8 @@ section[id].tab-active.hero {
 <section class="section galerie" id="galerie">
   <p class="section-eyebrow">Notre univers</p>
   <h2 class="section-title">La galerie</h2>
-  <p class="section-subtitle">Vos photos seront ajoutées prochainement pour illustrer nos créations.</p>
-  <div class="gallery-grid">
+  <p class="section-subtitle">Découvrez nos réalisations culinaires.</p>
+  <div class="gallery-grid" id="galerie-grid">
     <div class="g-cell"><div class="g-ph"><div class="g-ph-icon">🍽</div><div class="g-ph-text">Photo à venir</div></div><div class="g-label">Buffet traiteur</div></div>
     <div class="g-cell"><div class="g-ph"><div class="g-ph-icon">🥘</div><div class="g-ph-text">Photo à venir</div></div><div class="g-label">Plats chauds</div></div>
     <div class="g-cell"><div class="g-ph"><div class="g-ph-icon">🥗</div><div class="g-ph-text">Photo à venir</div></div><div class="g-label">Salades</div></div>
@@ -1130,6 +1163,7 @@ function closeAdmin(){
 function adminTab(tab,el){
   document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.admin-nav-btn').forEach(b=>b.classList.remove('active'));
+  if(tab==='photos') setTimeout(renderGalleryAdmin, 50);
   document.getElementById('admin-'+tab).classList.add('active');
   el.classList.add('active');
   if(tab==='menu')renderMenuEditor();
@@ -1398,6 +1432,7 @@ function addToCart(name, price, priceNum){
   saveCart();
   renderCart();
   renderCommandeGrid();
+  if(document.getElementById("galerie-grid")) renderGalerie();
   showCartNotif(name);
 }
 
@@ -1532,6 +1567,7 @@ function filterCommande(cat, btn){
   document.querySelectorAll('.produit-cat-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
   renderCommandeGrid();
+  if(document.getElementById("galerie-grid")) renderGalerie();
 }
 
 function renderCommandeGrid(){
@@ -1711,9 +1747,86 @@ function showZoneError(msg) {
   document.getElementById('zone-result').style.display = 'none';
 }
 
+
+// ===== GALERIE ADMIN =====
+var GALLERY_KEY = 'ness_gallery';
+
+function getGallery(){ try{ return JSON.parse(localStorage.getItem(GALLERY_KEY)||'[]'); }catch{ return []; } }
+function saveGallery(g){ localStorage.setItem(GALLERY_KEY, JSON.stringify(g)); }
+
+function handleGalleryUpload(input){
+  const files = Array.from(input.files);
+  const gallery = getGallery();
+  let loaded = 0;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(e){
+      gallery.push({ src: e.target.result, name: file.name, date: new Date().toLocaleDateString('fr-FR') });
+      loaded++;
+      if(loaded === files.length){
+        saveGallery(gallery);
+        renderGalleryAdmin();
+        renderGalerie(); // Mettre à jour la galerie publique
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function deleteGalleryPhoto(idx){
+  const gallery = getGallery();
+  gallery.splice(idx, 1);
+  saveGallery(gallery);
+  renderGalleryAdmin();
+  renderGalerie();
+}
+
+function clearGallery(){
+  if(!confirm('Supprimer toutes les photos de la galerie ?')) return;
+  saveGallery([]);
+  renderGalleryAdmin();
+  renderGalerie();
+}
+
+function renderGalleryAdmin(){
+  const grid = document.getElementById('gallery-admin-grid');
+  const label = document.getElementById('gallery-count-label');
+  if(!grid) return;
+  const gallery = getGallery();
+  if(label) label.textContent = gallery.length + ' photo(s) dans la galerie';
+  if(gallery.length === 0){
+    grid.innerHTML = '<div class="gallery-admin-empty">📷 Aucune photo — cliquez sur "+ Ajouter des photos" pour commencer</div>';
+    return;
+  }
+  grid.innerHTML = gallery.map((p,i) => `
+    <div class="gallery-admin-item">
+      <img src="${p.src}" alt="${p.name}" loading="lazy">
+      <button class="del-btn" onclick="deleteGalleryPhoto(${i})" title="Supprimer">✕</button>
+    </div>
+  `).join('');
+}
+
+
+function renderGalerie(){
+  const grid = document.getElementById('galerie-grid');
+  if(!grid) return;
+  const gallery = getGallery();
+  if(gallery.length === 0){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-light);font-size:0.85rem">Aucune photo pour le moment. Ajoutez des photos depuis votre espace admin.</div>';
+    return;
+  }
+  grid.innerHTML = gallery.map(p => `
+    <div class="galerie-item">
+      <img src="${p.src}" alt="${p.name}" loading="lazy">
+    </div>
+  `).join('');
+}
+
 // ===== INIT =====
 renderMenuContent();
 renderCommandeGrid();
+  if(document.getElementById("galerie-grid")) renderGalerie();
 applyStoredPhotos();
 const session=getSession();
 if(session){updateNavForUser(session)}
