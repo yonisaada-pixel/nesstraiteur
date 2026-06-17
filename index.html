@@ -470,6 +470,18 @@ section[id].tab-active.hero {
 .commande-card-photo-empty input{display:none}
 .commande-card{padding:0}
 .commande-card > div:last-child{padding:1rem}
+
+/* ===== ADMIN PHOTOS SIMPLE ===== */
+.photo-upload-box{border:2px dashed var(--nude-3);padding:2rem;text-align:center;background:var(--nude-1);border-radius:4px}
+.photo-upload-btn{display:inline-block;background:var(--warm-dark);color:var(--nude-1);padding:0.7rem 1.5rem;cursor:pointer;font-family:'Jost',sans-serif;font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;border-radius:2px}
+.photo-upload-btn:hover{background:var(--gold)}
+.photo-upload-btn input{display:none}
+.photo-list-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem}
+.photo-list-item{background:var(--white);border:1px solid var(--nude-2);border-radius:2px;overflow:hidden}
+.photo-list-item img{width:100%;height:130px;object-fit:cover}
+.photo-list-item-info{padding:0.6rem 0.8rem;display:flex;justify-content:space-between;align-items:center}
+.photo-list-item-name{font-size:0.75rem;color:var(--warm-dark);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-list-item-del{background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.85rem;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -584,13 +596,40 @@ section[id].tab-active.hero {
 
     <!-- PRODUITS ADMIN -->
     <div class="admin-section" id="admin-produits">
-      <div class="admin-toolbar">
-        <h3 style="margin:0;border:none;padding:0">📸 Gestion des photos produits</h3>
-        <button class="btn-sm" onclick="addAdminProduit()">+ Ajouter un produit</button>
+      <h3>📸 Ajouter / Changer une photo de plat</h3>
+      <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem">
+        Sélectionnez votre photo, choisissez le plat correspondant, puis cliquez sur Enregistrer.
+      </p>
+
+      <!-- Étape 1 : Upload photo -->
+      <div class="photo-upload-box" id="photo-upload-box">
+        <div class="photo-upload-preview" id="photo-preview-wrap" style="display:none">
+          <img id="photo-preview-img" src="" alt="Aperçu" style="max-height:200px;max-width:100%;border-radius:4px;margin-bottom:1rem">
+        </div>
+        <label class="photo-upload-btn">
+          📁 Choisir une photo
+          <input type="file" id="photo-file-input" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+        </label>
+        <div id="photo-file-name" style="font-size:0.75rem;color:var(--text-light);margin-top:0.5rem"></div>
       </div>
-      <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1.5rem">Cliquez sur une carte pour uploader ou changer la photo. Les modifications sont sauvegardées automatiquement.</p>
-      <div class="admin-produits-grid" id="admin-produits-grid"></div>
-      <div class="save-bar"><span>Les photos sont sauvegardées localement dans votre navigateur</span><button class="btn-sm" onclick="renderAdminProduits()">🔄 Actualiser</button></div>
+
+      <!-- Étape 2 : Choisir le plat -->
+      <div class="f-group" style="margin-top:1.5rem">
+        <label class="f-label">Attribuer cette photo à un plat</label>
+        <select class="f-input" id="photo-plat-select">
+          <option value="">— Sélectionner un plat —</option>
+        </select>
+      </div>
+
+      <!-- Enregistrer -->
+      <button class="btn-gold" style="margin-top:1rem" onclick="saveItemPhoto()">✓ Enregistrer la photo</button>
+      <div id="photo-save-msg" style="display:none;margin-top:0.75rem;padding:0.6rem 1rem;background:#f0fdf4;border-left:3px solid #22c55e;font-size:0.82rem;color:#166534">✅ Photo enregistrée !</div>
+
+      <!-- Liste des photos existantes -->
+      <div style="margin-top:2.5rem">
+        <h4 style="font-size:0.85rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-light);margin-bottom:1rem">Photos existantes</h4>
+        <div class="photo-list-grid" id="photo-list-grid"></div>
+      </div>
     </div>
 
         
@@ -1175,6 +1214,7 @@ function adminTab(tab,el){
   document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.admin-nav-btn').forEach(b=>b.classList.remove('active'));
   if(tab==='photos') setTimeout(renderGalleryAdmin, 50);
+  if(tab==='produits'){ setTimeout(populatePlatSelect, 50); setTimeout(renderPhotoList, 50); }
   document.getElementById('admin-'+tab).classList.add('active');
   el.classList.add('active');
   if(tab==='menu')renderMenuEditor();
@@ -1870,6 +1910,102 @@ function handleItemPhoto(input, key){
 
 function checkAdminSession(){
   try{ return !!localStorage.getItem('ness_admin_session'); }catch{ return false; }
+}
+
+
+// ===== GESTION PHOTOS ADMIN =====
+var _photoFileData = null;
+
+function previewPhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  document.getElementById('photo-file-name').textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    _photoFileData = e.target.result;
+    document.getElementById('photo-preview-img').src = e.target.result;
+    document.getElementById('photo-preview-wrap').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function populatePlatSelect(){
+  const select = document.getElementById('photo-plat-select');
+  if(!select) return;
+  const menu = getMenu();
+  const catLabels = {plats:'Plats',quiches:'Quiches',couscous:'Avec couscous',supplements:'Suppléments',salades:'Salades',desserts:'Desserts',boissons:'Boissons',vins:'Vins'};
+  select.innerHTML = '<option value="">— Sélectionner un plat —</option>';
+  Object.keys(menu).forEach(cat => {
+    const label = catLabels[cat] || cat;
+    const group = document.createElement('optgroup');
+    group.label = label;
+    (menu[cat]||[]).forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = cat + '__' + item.name;
+      opt.textContent = item.name;
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
+  });
+}
+
+function saveItemPhoto(){
+  const select = document.getElementById('photo-plat-select');
+  const msg = document.getElementById('photo-save-msg');
+  if(!_photoFileData){ alert('Veuillez choisir une photo.'); return; }
+  if(!select.value){ alert('Veuillez sélectionner un plat.'); return; }
+  
+  const photos = getItemPhotos();
+  const key = select.value.replace('__', '_');
+  photos[key] = _photoFileData;
+  localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
+  
+  msg.style.display = 'block';
+  setTimeout(()=>{ msg.style.display='none'; }, 3000);
+  
+  // Reset
+  _photoFileData = null;
+  document.getElementById('photo-file-input').value = '';
+  document.getElementById('photo-preview-wrap').style.display = 'none';
+  document.getElementById('photo-file-name').textContent = '';
+  select.value = '';
+  
+  renderPhotoList();
+  renderCommandeGrid();
+}
+
+function renderPhotoList(){
+  const grid = document.getElementById('photo-list-grid');
+  if(!grid) return;
+  const photos = getItemPhotos();
+  const keys = Object.keys(photos);
+  if(keys.length === 0){
+    grid.innerHTML = '<div style="color:var(--text-light);font-size:0.82rem">Aucune photo enregistrée.</div>';
+    return;
+  }
+  const menu = getMenu();
+  grid.innerHTML = keys.map(key => {
+    // Retrouver le nom du plat depuis la clé
+    const parts = key.split('_');
+    const cat = parts[0];
+    const name = parts.slice(1).join('_');
+    return `<div class="photo-list-item">
+      <img src="${photos[key]}" alt="${name}">
+      <div class="photo-list-item-info">
+        <span class="photo-list-item-name" title="${name}">${name}</span>
+        <button class="photo-list-item-del" onclick="deleteItemPhoto('${key.replace(/'/g,"\\'")}')" title="Supprimer">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deleteItemPhoto(key){
+  if(!confirm('Supprimer cette photo ?')) return;
+  const photos = getItemPhotos();
+  delete photos[key];
+  localStorage.setItem(ITEM_PHOTOS_KEY, JSON.stringify(photos));
+  renderPhotoList();
+  renderCommandeGrid();
 }
 
 // ===== INIT =====
