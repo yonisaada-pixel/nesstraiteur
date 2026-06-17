@@ -977,6 +977,10 @@ section[id].tab-active.hero {
 </div><!-- /main-site -->
 
 <script>
+// ===== VARIABLES GLOBALES =====
+var currentCommandeCat = 'plats';
+
+
 
 function showTab(tabName) {
   // Cacher toutes les sections
@@ -1614,7 +1618,6 @@ renderCart();
 
 
 // ===== GRILLE COMMANDE =====
-var currentCommandeCat = 'plats';
 
 function filterCommande(cat, btn){
   currentCommandeCat = cat;
@@ -1725,7 +1728,6 @@ const ZONE_INFO = {
   4: { name:'Zone 4 — Grande Couronne', price:'29,80 €', fee:29.80, desc:'77 Seine-et-Marne · 78 Yvelines · 91 Essonne · 95 Val-d\'Oise', color:'var(--warm-dark)' },
 };
 
-var _zoneTimer = null;
 
 function detectZone(address) {
   clearTimeout(_zoneTimer);
@@ -1894,7 +1896,6 @@ function renderGalerie(){
 
 
 // ===== PHOTOS PAR PLAT =====
-var ITEM_PHOTOS_KEY = 'ness_item_photos';
 
 function getItemPhotos(){ try{ return JSON.parse(localStorage.getItem(ITEM_PHOTOS_KEY)||'{}'); }catch{ return {}; } }
 
@@ -1917,7 +1918,6 @@ function checkAdminSession(){
 
 
 // ===== GESTION PHOTOS ADMIN =====
-var _photoFileData = null;
 
 function previewPhoto(input){
   const file = input.files[0];
